@@ -1,4 +1,4 @@
-name: Check team page
+name: Check and deploy team page
 
 on:
   push:
@@ -7,17 +7,37 @@ on:
 
 permissions:
   contents: read
+  pages: write
+  id-token: write
 
 jobs:
-  check:
+  publish:
     runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
       - name: Get project files
         uses: actions/checkout@v6
 
-      - name: Check homepage exists and is not empty
+      - name: Check homepage
         run: test -s index.html
 
-      - name: Report success
-        run: echo "Homepage check passed!"
+      - name: Prepare website files
+        run: |
+          mkdir -p _site
+          cp index.html _site/
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload website files
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+
+      - name: Deploy website
+        id: deployment
+        uses: actions/deploy-pages@v4
