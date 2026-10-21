@@ -1,14 +1,23 @@
-name: My First Workflow
+name: Check team page
 
 on:
   push:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
-  hello:
+  check:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Say Hello
-        run: echo "Hello from GitHub Actions!"
+      - name: Get project files
+        uses: actions/checkout@v6
+
+      - name: Check homepage exists and is not empty
+        run: test -s index.html
+
+      - name: Report success
+        run: echo "Homepage check passed!"
